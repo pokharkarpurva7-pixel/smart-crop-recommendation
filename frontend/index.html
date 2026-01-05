@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Crop Recommender — Creative UI</title>
+
+  <!-- Fonts & Chart.js -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js" defer></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Subtle animated background -->
+  <div id="bgParticles" aria-hidden="true"></div>
+
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🌿</div>
+        <div class="brand-text">
+          <h1>Crop Recommender</h1>
+          <p class="tag">Smart crop suggestions — beautiful, fast, playful</p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <input id="search" type="search" placeholder="Search crops (e.g. Rice, Mango)..." aria-label="Search crops" />
+        <select id="preset" title="Presets" aria-label="Region presets">
+          <option value="">Presets — try a climate</option>
+          <option value="default">Typical</option>
+          <option value="dry">Dry region (sunny)</option>
+          <option value="wet">Wet region</option>
+          <option value="hot">Hot climate</option>
+        </select>
+        <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">🌓</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="left-col">
+        <form id="form" class="card panel" aria-labelledby="formTitle">
+          <div class="form-header">
+            <h2 id="formTitle">Field inputs</h2>
+            <small class="muted">Soil & local weather values</small>
+          </div>
+
+          <div class="inputs-grid">
+            <label><span>N</span><input id="N" name="N" type="number" step="1" value="80" /></label>
+            <label><span>P</span><input id="P" name="P" type="number" step="1" value="50" /></label>
+            <label><span>K</span><input id="K" name="K" type="number" step="1" value="40" /></label>
+
+            <label><span>Temp (°C)</span><input id="temperature" name="temperature" type="number" step="0.1" value="22.0" /></label>
+            <label><span>Humidity %</span><input id="humidity" name="humidity" type="number" step="0.1" value="80.0" /></label>
+            <label><span>pH</span><input id="pH" name="pH" type="number" step="0.1" value="6.6" /></label>
+
+            <label class="wide"><span>Rainfall (mm)</span><input id="rainfall" name="rainfall" type="number" step="0.1" value="190.0" /></label>
+            <label class="wide"><span>Top K</span><input id="top_k" name="top_k" type="number" min="1" max="12" value="5" /></label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn primary">Recommend</button>
+            <button id="randomize" type="button" class="btn ghost">Random demo</button>
+            <button id="shuffleColors" type="button" class="btn accent">Shuffle colours</button>
+          </div>
+
+          <div class="form-hint muted">Use presets to quickly fill values. Click any card to open details or copy the crop name.</div>
+        </form>
+
+        <div class="card panel gallery-panel">
+          <div class="panel-header">
+            <h3>All-India Crops</h3>
+            <div class="panel-actions">
+              <button id="showAll" class="icon-btn" title="Reset filters">🔁</button>
+            </div>
+          </div>
+
+          <div id="cropGallery" class="crop-gallery" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <aside class="right-col">
+        <div class="card panel result-panel">
+          <div class="panel-header">
+            <h3>Recommendations</h3>
+            <div id="status" class="status">idle</div>
+          </div>
+
+          <div id="result" class="results-area">
+            <div class="empty-state">
+              <div class="sparkle">✨</div>
+              <p class="muted">Run a recommendation to see top crops with probabilities and cute visuals.</p>
+            </div>
+          </div>
+
+          <div class="chart-row">
+            <canvas id="probChart" width="300" height="300" aria-label="Probability chart"></canvas>
+            <div id="chartLegend" class="chart-legend"></div>
+          </div>
+        </div>
+
+        <div class="card panel info-panel">
+          <h4>Quick tips</h4>
+          <ul>
+            <li>Accurate soil tests → better recommendations.</li>
+            <li>Use Top-K to compare alternatives.</li>
+            <li>Save local presets for repeated fields.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Crop detail modal -->
+  <div id="cropModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <button id="closeModal" class="close-btn" aria-label="Close">✕</button>
+      <div id="modalContent"></div>
+      <div class="modal-actions">
+        <button id="useAsPreset" class="btn primary">Use as preset</button>
+        <button id="copyName" class="btn ghost">Copy name</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
