@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Crop Recommender — Creative UI</title>
+  <title>Crop Recommender — Wow UI</title>
 
   <!-- Fonts & Chart.js -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -12,51 +12,76 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Subtle animated background -->
+  <!-- Subtle animated particles background -->
   <div id="bgParticles" aria-hidden="true"></div>
 
-  <div class="shell">
+  <!-- Blue-light rain overlay (hidden by default) -->
+  <div id="blueRain" aria-hidden="true" class="hidden">
+    <canvas id="blueRainCanvas"></canvas>
+  </div>
+
+  <!-- Confetti canvas used for "shock" celebration -->
+  <canvas id="confettiCanvas" class="confetti" aria-hidden="true"></canvas>
+
+  <div class="shell" id="appRoot">
     <header class="topbar">
       <div class="brand">
-        <div class="logo">🌿</div>
+        <div class="logo-plate" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="#1db954"/>
+                <stop offset="1" stop-color="#18a0ff"/>
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="60" height="60" rx="12" fill="url(#g1)" opacity="0.95"/>
+            <g transform="translate(6,8)" fill="#fff">
+              <path d="M22 42v-8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M22 34c0-10 8-17 8-17s-5 0-8 5" />
+              <path d="M22 34c0-10-8-17-8-17s5 0 8 5" />
+            </g>
+          </svg>
+        </div>
         <div class="brand-text">
-          <h1>Crop Recommender</h1>
-          <p class="tag">Smart crop suggestions — beautiful, fast, playful</p>
+          <h1 id="appTitle">Crop Recommender</h1>
+          <p class="tag">Smart suggestions • Playful UI</p>
         </div>
       </div>
 
       <div class="controls">
-        <input id="search" type="search" placeholder="Search crops (e.g. Rice, Mango)..." aria-label="Search crops" />
-        <select id="preset" title="Presets" aria-label="Region presets">
-          <option value="">Presets — try a climate</option>
+        <input id="search" class="search" type="search" placeholder="Search crops (Rice, Mango...)" aria-label="Search crops" />
+        <select id="preset" class="preset" aria-label="Region presets">
+          <option value="">Presets</option>
           <option value="default">Typical</option>
-          <option value="dry">Dry region (sunny)</option>
-          <option value="wet">Wet region</option>
-          <option value="hot">Hot climate</option>
+          <option value="dry">Dry (sunny)</option>
+          <option value="wet">Wet (rain)</option>
+          <option value="hot">Hot</option>
         </select>
+
+        <button id="rainToggle" class="icon-btn" title="Toggle rain" aria-label="Toggle rain">🌧️</button>
         <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">🌓</button>
       </div>
     </header>
 
     <main class="main">
       <section class="left-col">
-        <form id="form" class="card panel" aria-labelledby="formTitle">
+        <form id="form" class="card panel glass" aria-labelledby="formTitle">
           <div class="form-header">
             <h2 id="formTitle">Field inputs</h2>
-            <small class="muted">Soil & local weather values</small>
+            <small class="muted">Soil & microclimate values — try presets</small>
           </div>
 
           <div class="inputs-grid">
-            <label><span>N</span><input id="N" name="N" type="number" step="1" value="80" /></label>
-            <label><span>P</span><input id="P" name="P" type="number" step="1" value="50" /></label>
-            <label><span>K</span><input id="K" name="K" type="number" step="1" value="40" /></label>
+            <label class="fld"><span class="lbl">N</span><input id="N" name="N" type="number" step="1" value="80" /></label>
+            <label class="fld"><span class="lbl">P</span><input id="P" name="P" type="number" step="1" value="50" /></label>
+            <label class="fld"><span class="lbl">K</span><input id="K" name="K" type="number" step="1" value="40" /></label>
 
-            <label><span>Temp (°C)</span><input id="temperature" name="temperature" type="number" step="0.1" value="22.0" /></label>
-            <label><span>Humidity %</span><input id="humidity" name="humidity" type="number" step="0.1" value="80.0" /></label>
-            <label><span>pH</span><input id="pH" name="pH" type="number" step="0.1" value="6.6" /></label>
+            <label class="fld"><span class="lbl">Temp (°C)</span><input id="temperature" name="temperature" type="number" step="0.1" value="22.0" /></label>
+            <label class="fld"><span class="lbl">Humidity %</span><input id="humidity" name="humidity" type="number" step="0.1" value="80.0" /></label>
+            <label class="fld"><span class="lbl">pH</span><input id="pH" name="pH" type="number" step="0.1" value="6.6" /></label>
 
-            <label class="wide"><span>Rainfall (mm)</span><input id="rainfall" name="rainfall" type="number" step="0.1" value="190.0" /></label>
-            <label class="wide"><span>Top K</span><input id="top_k" name="top_k" type="number" min="1" max="12" value="5" /></label>
+            <label class="fld wide"><span class="lbl">Rainfall (mm)</span><input id="rainfall" name="rainfall" type="number" step="0.1" value="190.0" /></label>
+            <label class="fld wide"><span class="lbl">Top K</span><input id="top_k" name="top_k" type="number" min="1" max="12" value="5" /></label>
           </div>
 
           <div class="form-actions">
@@ -65,10 +90,10 @@
             <button id="shuffleColors" type="button" class="btn accent">Shuffle colours</button>
           </div>
 
-          <div class="form-hint muted">Use presets to quickly fill values. Click any card to open details or copy the crop name.</div>
+          <div class="form-hint muted">Pick a preset or inputs then click Recommend — watch the magic.</div>
         </form>
 
-        <div class="card panel gallery-panel">
+        <div class="card panel gallery-panel glass">
           <div class="panel-header">
             <h3>All-India Crops</h3>
             <div class="panel-actions">
@@ -81,7 +106,7 @@
       </section>
 
       <aside class="right-col">
-        <div class="card panel result-panel">
+        <div class="card panel result-panel glass">
           <div class="panel-header">
             <h3>Recommendations</h3>
             <div id="status" class="status">idle</div>
@@ -90,7 +115,7 @@
           <div id="result" class="results-area">
             <div class="empty-state">
               <div class="sparkle">✨</div>
-              <p class="muted">Run a recommendation to see top crops with probabilities and cute visuals.</p>
+              <p class="muted">Run a recommendation to see top crops highlighted with an animation.</p>
             </div>
           </div>
 
@@ -100,12 +125,12 @@
           </div>
         </div>
 
-        <div class="card panel info-panel">
+        <div class="card panel info-panel glass">
           <h4>Quick tips</h4>
           <ul>
-            <li>Accurate soil tests → better recommendations.</li>
-            <li>Use Top-K to compare alternatives.</li>
-            <li>Save local presets for repeated fields.</li>
+            <li>Use accurate soil tests for better suggestions.</li>
+            <li>Top-K reveals viable alternatives for your field.</li>
+            <li>Click the rain icon or choose "wet" to preview weather animation (decorative).</li>
           </ul>
         </div>
       </aside>
